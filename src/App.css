@@ -1,0 +1,128 @@
+*, *::after, *::before{
+    font-family: "Cairo", serif !important;
+}
+@media (max-width: 445px) {
+    .meter_admin_container, .box-audit, .users_container{
+      width: 320px !important
+    }
+  }
+  
+  @media(min-width: 446px) and (max-width: 465px) {
+    .meter_admin_container, .box-audit, .users_container{
+      width: 380px !important
+    }
+  }
+  
+  @media (min-width: 466px) and (max-width: 575px) {
+    .meter_admin_container, .box-audit{
+      width: 400px !important
+    }
+  }
+  
+  @media (min-width: 576px) and (max-width: 767px) {
+    .meter_admin_container, .box-audit{
+      width: 500px !important
+    }
+  }
+  @media (min-width: 768px) and (max-width: 990px) {
+    .meter_admin_container, .box-audit{
+      width: 700px !important
+    }
+  }
+  
+  @media (min-width: 991px) and (max-width: 1199px) {
+    .meter_admin_container, .box-audit{
+      width: 900px !important
+    }
+  }
+  @media (min-width: 1200px) {
+    .meter_admin_container, .box-audit{
+      width: 1100px !important
+    }
+  }
+  
+  @media (min-width: 1366px) {
+    .meter_admin_container, .box-audit{
+      width: 1157px !important
+    }
+  }
+
+
+  @media (min-width: 768px) and (max-width: 991px){
+    .table_connect_container{
+      width: 800px !important;
+    }
+  }
+
+  .sidebar-container {
+    height: 100%;
+    background: #ffffff;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+  }
+  
+  .hvr-wobble-horizontal {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .hvr-wobble-horizontal:hover {
+    transform: translateX(5px);
+    background: linear-gradient(to right, #f5f9ff 0%, #ecf5ff 100%) !important;
+    border-right: 3px solid #0288d1;
+  }
+  
+  .hvr-wobble-horizontal .MuiListItemIcon-root {
+    color: #546e7a;
+    transition: all 0.3s ease;
+  }
+  
+  .hvr-wobble-horizontal:hover .MuiListItemIcon-root {
+    color: #0288d1;
+  }
+  
+  .MuiListItemText-primary {
+    font-weight: 500 !important;
+    color: #37474f;
+    font-size: 0.95rem !important;
+  }
+  
+  /* Additional smooth animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .MuiDrawer-root .MuiDrawer-paper {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .MuiListItem-root {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .MuiListItem-root::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: #0288d1;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .MuiListItem-root:hover::after {
+    transform: translateX(0);
+  }
+  
+  .root-MuiDrawer-paper, .MuiPaper-root.MuiPaper-elevation{
+    overflow: hidden !important;
+  }
+
+  .css-1uymsp1
+{
+  padding: 0 !important
+}
+ 

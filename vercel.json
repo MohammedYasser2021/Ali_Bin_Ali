@@ -1,0 +1,9 @@
+{
+    "routes": [
+      { "handle": "filesystem" },
+      { "src": "/booking", "dest": "/" },
+      { "src": "/(.*)", "dest": "/" }
+    ]
+  }
+
+  
