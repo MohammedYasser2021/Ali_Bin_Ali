@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -20,9 +20,7 @@ import {
   FaBriefcase,
 } from "react-icons/fa";
 import axios from "axios";
-import image1 from "../assets/image1.jpg";
-import image2 from "../assets/image2.jpg";
-import image3 from "../assets/image3.jpg";
+import image4 from "../assets/image4.jpg";
 
 function BookingPage({ language }) {
   const [name, setName] = useState("");
@@ -33,34 +31,23 @@ function BookingPage({ language }) {
   const [openAlert, setOpenAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccess, setAlertSuccess] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const images = [image1, image2, image3];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 4000); // Change image every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [images.length]);
 
   const content = {
     AR: {
-      title: "احجز موعدك الآن",
+      title: " نموذج طلب إجازة",
       subtitle: "نقدم خدمات طبية متخصصة بأحدث التقنيات العالمية",
       name: "الاسم الكامل",
       id: "رقم الهوية",
       phone: "رقم الجوال",
       employer: "جهة العمل",
       birthDate: "تاريخ الميلاد",
-      submit: "احجز الآن",
+      submit: "إرسال ",
       successMessage: "تم إرسال بياناتك بنجاح!",
       errorMessage: "حدث خطأ في إرسال البيانات",
       fillAllFields: "يرجى إدخال جميع البيانات",
     },
     EN: {
-      title: "Book Your Appointment Now",
+      title: "Leave Request Form",
       subtitle:
         "We offer specialized medical services with the latest global technologies",
       name: "Full Name",
@@ -68,7 +55,7 @@ function BookingPage({ language }) {
       phone: "Phone Number",
       employer: "Employer",
       birthDate: "Birth Date",
-      submit: "Book Now",
+      submit: "Send",
       successMessage: "Your information has been sent successfully!",
       errorMessage: "Error submitting data",
       fillAllFields: "Please enter all information",
@@ -125,11 +112,18 @@ function BookingPage({ language }) {
     "& .MuiOutlinedInput-root": {
       color: "#333333",
       backgroundColor: "#ffffff",
-      "& fieldset": { borderColor: "rgba(211, 47, 47, 0.3)" },
-      "&:hover fieldset": {
-        borderColor: "rgba(211, 47, 47, 0.5)",
+      borderRadius: "12px",
+      "& fieldset": { 
+        borderColor: "rgba(211, 47, 47, 0.3)",
+        borderWidth: "2px",
       },
-      "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+      "&:hover fieldset": {
+        borderColor: "rgba(211, 47, 47, 0.6)",
+      },
+      "&.Mui-focused fieldset": { 
+        borderColor: "#d32f2f",
+        borderWidth: "2px",
+      },
       "& input::placeholder": {
         color: "#d32f2f",
         opacity: 0.7,
@@ -137,6 +131,7 @@ function BookingPage({ language }) {
     },
     "& .MuiInputLabel-root": { 
       color: "#d32f2f",
+      fontWeight: 500,
       "&.Mui-focused": {
         color: "#d32f2f",
       },
@@ -147,218 +142,233 @@ function BookingPage({ language }) {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
+        background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
         direction: language === "AR" ? "rtl" : "ltr",
         color: "#333333",
+        py: { xs: 2, md: 4 },
       }}
     >
-      {/* Image Slider Section */}
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          height: "399px",
-          overflow: "hidden",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {images.map((image, index) => (
-          <Box
-            key={index}
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "1600px",
-              height: "399px",
-              backgroundImage: `url(${image})`,
-              backgroundSize: "1600px 399px",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              opacity: index === currentImageIndex ? 1 : 0,
-              transition: "opacity 1s ease-in-out",
-            }}
-          />
-        ))}
-      </Box>
-
-      {/* Form Section */}
-      <Box
-        sx={{
-          py: { xs: 4, md: 6 },
-          background: "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
-        }}
-      >
-        <Container maxWidth="lg">
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          {/* Header Image */}
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              width: "100%",
+              maxWidth: "900px",
+              height: { xs: "250px", sm: "300px", md: "350px" },
+              borderRadius: "20px",
+              overflow: "hidden",
+              boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
+              position: "relative",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "linear-gradient(45deg, rgba(211, 47, 47, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%)",
+                zIndex: 1,
+              }
             }}
           >
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "900px",
-                p: { xs: 3, sm: 4, md: 5 },
-                borderRadius: "20px",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+                height: "100%",
+                backgroundImage: `url(${image4})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          </Box>
+
+          {/* Form Section */}
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: "900px",
+              p: { xs: 3, sm: 4, md: 5 },
+              borderRadius: "20px",
+              boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
+              background:
+                "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%)",
+              backdropFilter: "blur(20px)",
+              border: "2px solid rgba(211, 47, 47, 0.1)",
+              position: "relative",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                background: "linear-gradient(90deg, #d32f2f 0%, #f44336 100%)",
+                borderRadius: "20px 20px 0 0",
+              }
+            }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
+                fontWeight: 700,
+                mb: 2,
                 background:
-                  "linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 250, 0.98) 100%)",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(211, 47, 47, 0.1)",
+                  "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                textAlign: "center",
+                lineHeight: 1.2,
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
               }}
             >
-              <Typography
-                variant="h1"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  background:
-                    "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  color: "transparent",
-                  fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.8rem" },
-                  textAlign: "center",
-                  lineHeight: 1.2,
-                }}
-              >
-                {currentContent.title}
-              </Typography>
+              {currentContent.title}
+            </Typography>
 
-              <Typography
-                variant="h6"
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#666666",
+                mb: 5,
+                textAlign: "center",
+                fontSize: { xs: "1.1rem", sm: "1.2rem" },
+                lineHeight: 1.6,
+                fontWeight: 400,
+              }}
+            >
+              {currentContent.subtitle}
+            </Typography>
+
+            <Box component="form" onSubmit={handleFormSubmit}>
+              <Box
                 sx={{
-                  color: "#666666",
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                  gap: 4,
                   mb: 4,
-                  textAlign: "center",
-                  fontSize: { xs: "1rem", sm: "1.1rem" },
-                  lineHeight: 1.5,
                 }}
               >
-                {currentContent.subtitle}
-              </Typography>
-
-              <Box component="form" onSubmit={handleFormSubmit}>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    gap: 3,
-                    mb: 3,
-                  }}
-                >
-                  <TextField
-                    label={currentContent.name}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-
-                  <TextField
-                    label={currentContent.id}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={id}
-                    onChange={(e) => setId(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    gap: 3,
-                    mb: 3,
-                  }}
-                >
-                  <TextField
-                    label={currentContent.phone}
-                    variant="outlined"
-                    fullWidth
-                    type="tel"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    sx={textFieldSx}
-                    value={phone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, "");
-                      setPhone(value);
-                    }}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-
-                  <TextField
-                    label={currentContent.employer}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={employer}
-                    onChange={(e) => setEmployer(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-                </Box>
-
                 <TextField
-                  label={currentContent.birthDate}
+                  label={currentContent.name}
                   variant="outlined"
                   fullWidth
-                  type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  sx={{
-                    mb: 4,
-                    ...textFieldSx,
-                  }}
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  sx={textFieldSx}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   dir={language === "AR" ? "rtl" : "ltr"}
                 />
 
-                <Button
-                  type="submit"
-                  variant="contained"
+                <TextField
+                  label={currentContent.id}
+                  variant="outlined"
                   fullWidth
-                  sx={{
-                    py: 2.5,
-                    borderRadius: "12px",
-                    background:
-                      "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
-                    fontSize: { xs: "1.1rem", md: "1.2rem" },
-                    fontWeight: 600,
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 8px 25px rgba(211, 47, 47, 0.3)",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0 12px 35px rgba(211, 47, 47, 0.4)",
-                    },
-                  }}
-                >
-                  <FaCalendarAlt
-                    style={{
-                      marginRight: language === "AR" ? "0" : "8px",
-                      marginLeft: language === "AR" ? "8px" : "0",
-                      fontSize: "1rem",
-                    }}
-                  />
-                  {currentContent.submit}
-                </Button>
+                  sx={textFieldSx}
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
+                  dir={language === "AR" ? "rtl" : "ltr"}
+                />
               </Box>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                  gap: 4,
+                  mb: 4,
+                }}
+              >
+                <TextField
+                  label={currentContent.phone}
+                  variant="outlined"
+                  fullWidth
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  sx={textFieldSx}
+                  value={phone}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, "");
+                    setPhone(value);
+                  }}
+                  dir={language === "AR" ? "rtl" : "ltr"}
+                />
+
+                <TextField
+                  label={currentContent.employer}
+                  variant="outlined"
+                  fullWidth
+                  sx={textFieldSx}
+                  value={employer}
+                  onChange={(e) => setEmployer(e.target.value)}
+                  dir={language === "AR" ? "rtl" : "ltr"}
+                />
+              </Box>
+
+              <TextField
+                label={currentContent.birthDate}
+                variant="outlined"
+                fullWidth
+                type="date"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  mb: 5,
+                  ...textFieldSx,
+                }}
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                dir={language === "AR" ? "rtl" : "ltr"}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{
+                  py: 3,
+                  borderRadius: "15px",
+                  background:
+                    "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                  fontSize: { xs: "1.2rem", md: "1.3rem" },
+                  fontWeight: 700,
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
+                  textTransform: "none",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
+                    background:
+                      "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
+                  },
+                  "&:active": {
+                    transform: "translateY(0px)",
+                  },
+                }}
+              >
+                <FaCalendarAlt
+                  style={{
+                    marginRight: language === "AR" ? "0" : "12px",
+                    marginLeft: language === "AR" ? "12px" : "0",
+                    fontSize: "1.1rem",
+                  }}
+                />
+                {currentContent.submit}
+              </Button>
             </Box>
           </Box>
-        </Container>
-      </Box>
+        </Box>
+      </Container>
 
       {/* Alert Dialog */}
       <Dialog
@@ -366,12 +376,12 @@ function BookingPage({ language }) {
         onClose={() => setOpenAlert(false)}
         PaperProps={{
           sx: {
-            borderRadius: "15px",
+            borderRadius: "20px",
             background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-            border: `2px solid ${alertSuccess ? "#4CAF50" : "#f44336"}`,
-            minWidth: "300px",
+            border: `3px solid ${alertSuccess ? "#4CAF50" : "#f44336"}`,
+            minWidth: "350px",
             maxWidth: "90%",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+            boxShadow: "0 25px 50px rgba(0,0,0,0.2)",
           },
         }}
       >
@@ -379,10 +389,10 @@ function BookingPage({ language }) {
           sx={{
             color: alertSuccess ? "#4CAF50" : "#f44336",
             textAlign: "center",
-            pt: 3,
+            pt: 4,
             pb: 2,
-            fontSize: "1.3rem",
-            fontWeight: 600,
+            fontSize: "1.4rem",
+            fontWeight: 700,
           }}
         >
           {alertSuccess
@@ -396,10 +406,14 @@ function BookingPage({ language }) {
             onClick={() => setOpenAlert(false)}
             sx={{
               position: "absolute",
-              right: language === "AR" ? "auto" : 8,
-              left: language === "AR" ? 8 : "auto",
-              top: 8,
+              right: language === "AR" ? "auto" : 12,
+              left: language === "AR" ? 12 : "auto",
+              top: 12,
               color: alertSuccess ? "#4CAF50" : "#f44336",
+              backgroundColor: "rgba(0,0,0,0.05)",
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.1)",
+              },
             }}
           >
             <FaTimes />
@@ -409,10 +423,11 @@ function BookingPage({ language }) {
           sx={{
             color: "#333333",
             textAlign: "center",
-            pb: 3,
+            pb: 4,
+            px: 4,
           }}
         >
-          <Typography sx={{ fontSize: "1rem", lineHeight: 1.5 }}>
+          <Typography sx={{ fontSize: "1.1rem", lineHeight: 1.6, fontWeight: 500 }}>
             {alertMessage}
           </Typography>
         </DialogContent>
