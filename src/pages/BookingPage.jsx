@@ -64,48 +64,57 @@ function BookingPage({ language }) {
 
   const currentContent = content[language];
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+const handleFormSubmit = async (e) => {
+  e.preventDefault();
 
-    if (name && id && phone && employer && birthDate) {
-      try {
-        const data = {
-          Name: name,
-          ID: id,
-          Phone: phone,
-          Employer: employer,
-          BirthDate: birthDate,
-          Date: new Date().toLocaleString("en-US"),
-        };
+  if (name && id && phone && employer && birthDate) {
+    try {
+      // Format the data according to SheetDB requirements
+      const data = {
+        data: [{
+          الإسم_بالكامل: name,
+          رقم_الهوية: id,
+          رقم_الجوال: phone,
+          جهة_العمل: employer,
+          تاريخ_الميلاد: birthDate,
+          التاريخ: new Date().toLocaleString("en-US"),
+        }]
+      };
 
-        await axios.post("https://sheetdb.io/api/v1/tnihqse3el5wp", data, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await axios.post("https://sheetdb.io/api/v1/tnihqse3el5wp", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        setAlertSuccess(true);
-        setAlertMessage(currentContent.successMessage);
-        setOpenAlert(true);
+      console.log('Success response:', response.data);
+      
+      setAlertSuccess(true);
+      setAlertMessage(currentContent.successMessage);
+      setOpenAlert(true);
 
-        // Clear form
-        setName("");
-        setId("");
-        setPhone("");
-        setEmployer("");
-        setBirthDate("");
-      } catch (error) {
-        console.error("Error:", error);
-        setAlertSuccess(false);
-        setAlertMessage(currentContent.errorMessage);
-        setOpenAlert(true);
-      }
-    } else {
+      // Clear form
+      setName("");
+      setId("");
+      setPhone("");
+      setEmployer("");
+      setBirthDate("");
+    } catch (error) {
+      console.error("Full error object:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
       setAlertSuccess(false);
-      setAlertMessage(currentContent.fillAllFields);
+      setAlertMessage(currentContent.errorMessage);
       setOpenAlert(true);
     }
-  };
+  } else {
+    setAlertSuccess(false);
+    setAlertMessage(currentContent.fillAllFields);
+    setOpenAlert(true);
+  }
+};
+
 
   // Common TextField styling with red placeholder
   const textFieldSx = {
