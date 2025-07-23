@@ -9,6 +9,10 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import {
   FaPhoneAlt,
@@ -23,39 +27,55 @@ import axios from "axios";
 import image4 from "../assets/image4.jpg";
 
 function BookingPage({ language }) {
+  const [password, setPassword] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [name, setName] = useState("");
   const [id, setId] = useState("");
   const [phone, setPhone] = useState("");
   const [employer, setEmployer] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [leaveType, setLeaveType] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccess, setAlertSuccess] = useState(true);
 
+  const validPasswords = ["1458978", "1589956", "1255996", "1445588"];
+
   const content = {
     AR: {
-      title: " نموذج طلب إجازة",
+      title: "نموذج طلب إجازة",
       subtitle: "نقدم خدمات طبية متخصصة بأحدث التقنيات العالمية",
+      password: "كلمة المرور",
       name: "الاسم الكامل",
       id: "رقم الهوية",
       phone: "رقم الجوال",
       employer: "جهة العمل",
       birthDate: "تاريخ الميلاد",
-      submit: "إرسال ",
+      leaveType: "نوع الإجازة",
+      sickLeave: "إجازة مريض",
+      companionLeave: "إجازة مرافق مريض",
+      submit: "إرسال",
+      enterPassword: "إدخال",
+      invalidPassword: "كلمة المرور غير صحيحة",
       successMessage: "تم إرسال بياناتك بنجاح!",
       errorMessage: "حدث خطأ في إرسال البيانات",
       fillAllFields: "يرجى إدخال جميع البيانات",
     },
     EN: {
       title: "Leave Request Form",
-      subtitle:
-        "We offer specialized medical services with the latest global technologies",
+      subtitle: "We offer specialized medical services with the latest global technologies",
+      password: "Password",
       name: "Full Name",
       id: "ID Number",
       phone: "Phone Number",
       employer: "Employer",
       birthDate: "Birth Date",
+      leaveType: "Leave Type",
+      sickLeave: "Sick Leave",
+      companionLeave: "Patient Companion Leave",
       submit: "Send",
+      enterPassword: "Enter",
+      invalidPassword: "Invalid password",
       successMessage: "Your information has been sent successfully!",
       errorMessage: "Error submitting data",
       fillAllFields: "Please enter all information",
@@ -64,72 +84,84 @@ function BookingPage({ language }) {
 
   const currentContent = content[language];
 
-const handleFormSubmit = async (e) => {
-  e.preventDefault();
-
-  if (name && id && phone && employer && birthDate) {
-    try {
-      // Format the data according to SheetDB requirements
-      const data = {
-        data: [{
-          الإسم_بالكامل: name,
-          رقم_الهوية: id,
-          رقم_الجوال: phone,
-          جهة_العمل: employer,
-          تاريخ_الميلاد: birthDate,
-          التاريخ: new Date().toLocaleString("en-US"),
-        }]
-      };
-
-      const response = await axios.post("https://sheetdb.io/api/v1/tnihqse3el5wp", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log('Success response:', response.data);
-      
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (validPasswords.includes(password)) {
+      setIsAuthenticated(true);
       setAlertSuccess(true);
-      setAlertMessage(currentContent.successMessage);
+      setAlertMessage(language === "AR" ? "تم التحقق بنجاح!" : "Authentication successful!");
       setOpenAlert(true);
-
-      // Clear form
-      setName("");
-      setId("");
-      setPhone("");
-      setEmployer("");
-      setBirthDate("");
-    } catch (error) {
-      console.error("Full error object:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
-      
+    } else {
       setAlertSuccess(false);
-      setAlertMessage(currentContent.errorMessage);
+      setAlertMessage(currentContent.invalidPassword);
       setOpenAlert(true);
     }
-  } else {
-    setAlertSuccess(false);
-    setAlertMessage(currentContent.fillAllFields);
-    setOpenAlert(true);
-  }
-};
+  };
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
 
-  // Common TextField styling with red placeholder
+    if (name && id && phone && employer && birthDate && leaveType) {
+      try {
+        const data = {
+          data: [{
+            الأسم: name,
+            رقم_الهوية: id,
+            رقم_الجوال: phone,
+            جهة_العمل: employer,
+            تاريخ_الميلاد: birthDate,
+            نوع_الإجازة: leaveType,
+            وقت_ادخال_البيانات: new Date().toLocaleString("en-US"),
+          }],
+        };
+
+        const response = await axios.post("https://sheetdb.io/api/v1/tnihqse3el5wp", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("Success response:", response.data);
+
+        setAlertSuccess(true);
+        setAlertMessage(currentContent.successMessage);
+        setOpenAlert(true);
+
+        setName("");
+        setId("");
+        setPhone("");
+        setEmployer("");
+        setBirthDate("");
+        setLeaveType("");
+      } catch (error) {
+        console.error("Full error object:", error);
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
+
+        setAlertSuccess(false);
+        setAlertMessage(currentContent.errorMessage);
+        setOpenAlert(true);
+      }
+    } else {
+      setAlertSuccess(false);
+      setAlertMessage(currentContent.fillAllFields);
+      setOpenAlert(true);
+    }
+  };
+
   const textFieldSx = {
     "& .MuiOutlinedInput-root": {
       color: "#333333",
       backgroundColor: "#ffffff",
       borderRadius: "12px",
-      "& fieldset": { 
+      "& fieldset": {
         borderColor: "rgba(211, 47, 47, 0.3)",
         borderWidth: "2px",
       },
       "&:hover fieldset": {
         borderColor: "rgba(211, 47, 47, 0.6)",
       },
-      "&.Mui-focused fieldset": { 
+      "&.Mui-focused fieldset": {
         borderColor: "#d32f2f",
         borderWidth: "2px",
       },
@@ -138,7 +170,31 @@ const handleFormSubmit = async (e) => {
         opacity: 0.7,
       },
     },
-    "& .MuiInputLabel-root": { 
+    "& .MuiInputLabel-root": {
+      color: "#d32f2f",
+      fontWeight: 500,
+      "&.Mui-focused": {
+        color: "#d32f2f",
+      },
+    },
+  };
+
+  const selectSx = {
+    color: "#333333",
+    backgroundColor: "#ffffff",
+    borderRadius: "12px",
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "rgba(211, 47, 47, 0.3)",
+      borderWidth: "2px",
+    },
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "rgba(211, 47, 47, 0.6)",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#d32f2f",
+      borderWidth: "2px",
+    },
+    "& .MuiInputLabel-root": {
       color: "#d32f2f",
       fontWeight: 500,
       "&.Mui-focused": {
@@ -166,7 +222,6 @@ const handleFormSubmit = async (e) => {
             gap: 4,
           }}
         >
-          {/* Header Image */}
           <Box
             sx={{
               width: "100%",
@@ -185,7 +240,7 @@ const handleFormSubmit = async (e) => {
                 bottom: 0,
                 background: "linear-gradient(45deg, rgba(211, 47, 47, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%)",
                 zIndex: 1,
-              }
+              },
             }}
           >
             <Box
@@ -200,186 +255,303 @@ const handleFormSubmit = async (e) => {
             />
           </Box>
 
-          {/* Form Section */}
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: "900px",
-              p: { xs: 3, sm: 4, md: 5 },
-              borderRadius: "20px",
-              boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
-              background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%)",
-              backdropFilter: "blur(20px)",
-              border: "2px solid rgba(211, 47, 47, 0.1)",
-              position: "relative",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "4px",
-                background: "linear-gradient(90deg, #d32f2f 0%, #f44336 100%)",
-                borderRadius: "20px 20px 0 0",
-              }
-            }}
-          >
-            <Typography
-              variant="h1"
+          {!isAuthenticated ? (
+            <Box
               sx={{
-                fontWeight: 700,
-                mb: 2,
+                width: "100%",
+                maxWidth: "500px",
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: "20px",
+                boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
                 background:
-                  "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-                textAlign: "center",
-                lineHeight: 1.2,
-                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%)",
+                backdropFilter: "blur(20px)",
+                border: "2px solid rgba(211, 47, 47, 0.1)",
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "4px",
+                  background: "linear-gradient(90deg, #d32f2f 0%, #f44336 100%)",
+                  borderRadius: "20px 20px 0 0",
+                },
               }}
             >
-              {currentContent.title}
-            </Typography>
-
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#666666",
-                mb: 5,
-                textAlign: "center",
-                fontSize: { xs: "1.1rem", sm: "1.2rem" },
-                lineHeight: 1.6,
-                fontWeight: 400,
-              }}
-            >
-              {currentContent.subtitle}
-            </Typography>
-
-            <Box component="form" onSubmit={handleFormSubmit}>
-              <Box
+              <Typography
+                variant="h1"
                 sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                  gap: 4,
+                  fontWeight: 700,
                   mb: 4,
+                  background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
               >
-                <TextField
-                  label={currentContent.name}
-                  variant="outlined"
-                  fullWidth
-                  sx={textFieldSx}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  dir={language === "AR" ? "rtl" : "ltr"}
-                />
+                {language === "AR" ? "تسجيل الدخول" : "Login"}
+              </Typography>
 
+              <Box component="form" onSubmit={handlePasswordSubmit}>
                 <TextField
-                  label={currentContent.id}
+                  label={currentContent.password}
                   variant="outlined"
                   fullWidth
-                  sx={textFieldSx}
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  dir={language === "AR" ? "rtl" : "ltr"}
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                  gap: 4,
-                  mb: 4,
-                }}
-              >
-                <TextField
-                  label={currentContent.phone}
-                  variant="outlined"
-                  fullWidth
-                  type="tel"
+                  type="password"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  sx={textFieldSx}
-                  value={phone}
+                  sx={{
+                    mb: 4,
+                    ...textFieldSx,
+                  }}
+                  value={password}
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9]/g, "");
-                    setPhone(value);
+                    setPassword(value);
                   }}
                   dir={language === "AR" ? "rtl" : "ltr"}
                 />
 
-                <TextField
-                  label={currentContent.employer}
-                  variant="outlined"
+                <Button
+                  type="submit"
+                  variant="contained"
                   fullWidth
-                  sx={textFieldSx}
-                  value={employer}
-                  onChange={(e) => setEmployer(e.target.value)}
-                  dir={language === "AR" ? "rtl" : "ltr"}
-                />
+                  sx={{
+                    py: 3,
+                    borderRadius: "15px",
+                    background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                    fontSize: { xs: "1.2rem", md: "1.3rem" },
+                    fontWeight: 700,
+                    transition: "all 0.3s ease",
+                    boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
+                    textTransform: "none",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
+                      background: "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
+                    },
+                    "&:active": {
+                      transform: "translateY(0px)",
+                    },
+                  }}
+                >
+                  <FaCalendarAlt
+                    style={{
+                      marginRight: language === "AR" ? "0" : "12px",
+                      marginLeft: language === "AR" ? "12px" : "0",
+                      fontSize: "1.1rem",
+                    }}
+                  />
+                  {currentContent.enterPassword}
+                </Button>
               </Box>
-
-              <TextField
-                label={currentContent.birthDate}
-                variant="outlined"
-                fullWidth
-                type="date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: "900px",
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: "20px",
+                boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
+                background:
+                  "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%)",
+                backdropFilter: "blur(20px)",
+                border: "2px solid rgba(211, 47, 47, 0.1)",
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "4px",
+                  background: "linear-gradient(90deg, #d32f2f 0%, #f44336 100%)",
+                  borderRadius: "20px 20px 0 0",
+                },
+              }}
+            >
+              <Typography
+                variant="h1"
                 sx={{
-                  mb: 5,
-                  ...textFieldSx,
-                }}
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                dir={language === "AR" ? "rtl" : "ltr"}
-              />
-
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{
-                  py: 3,
-                  borderRadius: "15px",
-                  background:
-                    "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
-                  fontSize: { xs: "1.2rem", md: "1.3rem" },
                   fontWeight: 700,
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
-                  textTransform: "none",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
-                    background:
-                      "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
-                  },
-                  "&:active": {
-                    transform: "translateY(0px)",
-                  },
+                  mb: 2,
+                  background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
               >
-                <FaCalendarAlt
-                  style={{
-                    marginRight: language === "AR" ? "0" : "12px",
-                    marginLeft: language === "AR" ? "12px" : "0",
-                    fontSize: "1.1rem",
+                {currentContent.title}
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#666666",
+                  mb: 5,
+                  textAlign: "center",
+                  fontSize: { xs: "1.1rem", sm: "1.2rem" },
+                  lineHeight: 1.6,
+                  fontWeight: 400,
+                }}
+              >
+                {currentContent.subtitle}
+              </Typography>
+
+              <Box component="form" onSubmit={handleFormSubmit}>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 4,
+                    mb: 4,
                   }}
-                />
-                {currentContent.submit}
-              </Button>
+                >
+                  <TextField
+                    label={currentContent.name}
+                    variant="outlined"
+                    fullWidth
+                    sx={textFieldSx}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
+
+                  <TextField
+                    label={currentContent.id}
+                    variant="outlined"
+                    fullWidth
+                    sx={textFieldSx}
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 4,
+                    mb: 4,
+                  }}
+                >
+                  <TextField
+                    label={currentContent.phone}
+                    variant="outlined"
+                    fullWidth
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    sx={textFieldSx}
+                    value={phone}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, "");
+                      setPhone(value);
+                    }}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
+
+                  <TextField
+                    label={currentContent.employer}
+                    variant="outlined"
+                    fullWidth
+                    sx={textFieldSx}
+                    value={employer}
+                    onChange={(e) => setEmployer(e.target.value)}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 4,
+                    mb: 4,
+                  }}
+                >
+                  <TextField
+                    label={currentContent.birthDate}
+                    variant="outlined"
+                    fullWidth
+                    type="date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={textFieldSx}
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
+
+                  <FormControl fullWidth sx={selectSx}>
+                    <InputLabel>{currentContent.leaveType}</InputLabel>
+                    <Select
+                      value={leaveType}
+                      onChange={(e) => setLeaveType(e.target.value)}
+                      label={currentContent.leaveType}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    >
+                      <MenuItem value={currentContent.sickLeave}>
+                        {currentContent.sickLeave}
+                      </MenuItem>
+                      <MenuItem value={currentContent.companionLeave}>
+                        {currentContent.companionLeave}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    py: 3,
+                    borderRadius: "15px",
+                    background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                    fontSize: { xs: "1.2rem", md: "1.3rem" },
+                    fontWeight: 700,
+                    transition: "all 0.3s ease",
+                    boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
+                    textTransform: "none",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
+                      background: "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
+                    },
+                    "&:active": {
+                      transform: "translateY(0px)",
+                    },
+                  }}
+                >
+                  <FaCalendarAlt
+                    style={{
+                      marginRight: language === "AR" ? "0" : "12px",
+                      marginLeft: language === "AR" ? "12px" : "0",
+                      fontSize: "1.1rem",
+                    }}
+                  />
+                  {currentContent.submit}
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          )}
         </Box>
       </Container>
 
-      {/* Alert Dialog */}
       <Dialog
         open={openAlert}
         onClose={() => setOpenAlert(false)}
