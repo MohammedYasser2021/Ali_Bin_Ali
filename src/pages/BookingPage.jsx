@@ -10,6 +10,10 @@ import {
   DialogContent,
   IconButton,
   Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   FaPhoneAlt,
@@ -21,6 +25,7 @@ import {
   FaBriefcase,
   FaUser,
   FaUserFriends,
+  FaClipboardList,
 } from "react-icons/fa";
 import axios from "axios";
 import image4 from "../assets/image4.jpg";
@@ -28,6 +33,9 @@ import image4 from "../assets/image4.jpg";
 function BookingPage({ language }) {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // نوع الإجازة
+  const [leaveType, setLeaveType] = useState("patient");
   
   // بيانات المريض
   const [patientName, setPatientName] = useState("");
@@ -51,9 +59,13 @@ function BookingPage({ language }) {
 
   const content = {
     AR: {
-      title: "نموذج طلب إجازة مرافق مريض",
+      title: "نموذج طلب إجازة مرضية",
       subtitle: "نقدم خدمات طبية متخصصة بأحدث التقنيات العالمية",
       password: "كلمة المرور",
+      leaveType: "نوع الإجازة",
+      patientLeave: "اجازة مريض",
+      companionLeave: "اجازة مرافق مريض",
+      selectLeaveType: "اختر نوع الإجازة",
       patientData: "بيانات المريض",
       companionData: "بيانات مرافق المريض",
       name: "الاسم الكامل",
@@ -66,12 +78,17 @@ function BookingPage({ language }) {
       invalidPassword: "كلمة المرور غير صحيحة",
       successMessage: "تم إرسال بياناتك بنجاح!",
       errorMessage: "حدث خطأ في إرسال البيانات",
-      fillAllFields: "يرجى إدخال جميع البيانات",
+      fillAllFields: "يرجى إدخال جميع البيانات المطلوبة",
+      selectLeaveTypeFirst: "يرجى اختيار نوع الإجازة أولاً",
     },
     EN: {
-      title: "Patient Companion Leave Request Form",
+      title: "Medical Leave Request Form",
       subtitle: "We offer specialized medical services with the latest global technologies",
       password: "Password",
+      leaveType: "Leave Type",
+      patientLeave: "Patient Leave",
+      companionLeave: "Patient Companion Leave",
+      selectLeaveType: "Select Leave Type",
       patientData: "Patient Information",
       companionData: "Patient Companion Information",
       name: "Full Name",
@@ -84,7 +101,8 @@ function BookingPage({ language }) {
       invalidPassword: "Invalid password",
       successMessage: "Your information has been sent successfully!",
       errorMessage: "Error submitting data",
-      fillAllFields: "Please enter all information",
+      fillAllFields: "Please enter all required information",
+      selectLeaveTypeFirst: "Please select leave type first",
     },
   };
 
@@ -104,26 +122,55 @@ function BookingPage({ language }) {
     }
   };
 
+  const handleLeaveTypeChange = (event) => {
+    setLeaveType(event.target.value);
+    // إعادة تعيين بيانات المرافق عند تغيير نوع الإجازة
+    if (event.target.value === "patient") {
+      setCompanionName("");
+      setCompanionId("");
+      setCompanionPhone("");
+      setCompanionEmployer("");
+      setCompanionBirthDate("");
+    }
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      patientName && patientId && patientPhone && patientEmployer && patientBirthDate &&
-      companionName && companionId && companionPhone && companionEmployer && companionBirthDate
-    ) {
+    // التحقق من اختيار نوع الإجازة
+    if (!leaveType) {
+      setAlertSuccess(false);
+      setAlertMessage(currentContent.selectLeaveTypeFirst);
+      setOpenAlert(true);
+      return;
+    }
+
+    // التحقق من البيانات المطلوبة حسب نوع الإجازة
+    const patientDataComplete = patientName && patientId && patientPhone && patientEmployer && patientBirthDate;
+    const companionDataComplete = companionName && companionId && companionPhone && companionEmployer && companionBirthDate;
+
+    let isDataComplete = false;
+    if (leaveType === "patient") {
+      isDataComplete = patientDataComplete;
+    } else if (leaveType === "companion") {
+      isDataComplete = patientDataComplete && companionDataComplete;
+    }
+
+    if (isDataComplete) {
       try {
         const data = {
           data: [{
+            نوع_الإجازة: leaveType === "patient" ? "اجازة مريض" : "اجازة مرافق مريض",
             اسم_المريض: patientName,
             رقم_هوية_المريض: patientId,
             رقم_الجوال_المريض: patientPhone,
             جهة_العمل_المريض: patientEmployer,
             تاريخ_الميلاد_المريض: patientBirthDate,
-            اسم_مرافق_المريض: companionName,
-            رقم_هوية_مرافق_المريض: companionId,
-            رقم_الجوال_مرافق_المريض: companionPhone,
-            جهة_العمل_مرافق_المريض: companionEmployer,
-            تاريخ_الميلاد_مرافق_المريض: companionBirthDate,
+            اسم_مرافق_المريض: leaveType === "companion" ? companionName : "",
+            رقم_هوية_مرافق_المريض: leaveType === "companion" ? companionId : "",
+            رقم_الجوال_مرافق_المريض: leaveType === "companion" ? companionPhone : "",
+            جهة_العمل_مرافق_المريض: leaveType === "companion" ? companionEmployer : "",
+            تاريخ_الميلاد_مرافق_المريض: leaveType === "companion" ? companionBirthDate : "",
             وقت_ادخال_البيانات: new Date().toLocaleString("en-US"),
           }],
         };
@@ -141,6 +188,7 @@ function BookingPage({ language }) {
         setOpenAlert(true);
 
         // إعادة تعيين جميع الحقول
+        setLeaveType("");
         setPatientName("");
         setPatientId("");
         setPatientPhone("");
@@ -194,6 +242,17 @@ function BookingPage({ language }) {
       "&.Mui-focused": {
         color: "#d32f2f",
       },
+    },
+  };
+
+  const selectSx = {
+    ...textFieldSx,
+    "& .MuiSelect-select": {
+      color: "#333333",
+      backgroundColor: "#ffffff",
+    },
+    "& .MuiSelect-icon": {
+      color: "#d32f2f",
     },
   };
 
@@ -404,7 +463,7 @@ function BookingPage({ language }) {
               </Typography>
 
               <Box component="form" onSubmit={handleFormSubmit}>
-                {/* بيانات المريض */}
+                {/* اختيار نوع الإجازة */}
                 <Box sx={{ mb: 5 }}>
                   <Typography
                     variant="h4"
@@ -418,227 +477,269 @@ function BookingPage({ language }) {
                       fontSize: { xs: "1.5rem", md: "1.8rem" },
                     }}
                   >
-                    <FaUserMd style={{ fontSize: "1.2em" }} />
-                    {currentContent.patientData}
+                    <FaClipboardList style={{ fontSize: "1.2em" }} />
+                    {currentContent.leaveType}
                   </Typography>
 
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                      gap: 3,
-                      mb: 3,
-                    }}
-                  >
-                    <TextField
-                      label={currentContent.name}
-                      variant="outlined"
-                      fullWidth
-                      sx={textFieldSx}
-                      value={patientName}
-                      onChange={(e) => setPatientName(e.target.value)}
+                  <FormControl fullWidth sx={selectSx}>
+                    <InputLabel id="leave-type-label">{currentContent.selectLeaveType}</InputLabel>
+                    <Select
+                      labelId="leave-type-label"
+                      value={leaveType}
+                      label={currentContent.selectLeaveType}
+                      onChange={handleLeaveTypeChange}
                       dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-
-                    <TextField
-                      label={currentContent.id}
-                      variant="outlined"
-                      fullWidth
-                      sx={textFieldSx}
-                      value={patientId}
-                      onChange={(e) => setPatientId(e.target.value)}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                      gap: 3,
-                      mb: 3,
-                    }}
-                  >
-                    <TextField
-                      label={currentContent.phone}
-                      variant="outlined"
-                      fullWidth
-                      type="tel"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      sx={textFieldSx}
-                      value={patientPhone}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, "");
-                        setPatientPhone(value);
-                      }}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-
-                    <TextField
-                      label={currentContent.employer}
-                      variant="outlined"
-                      fullWidth
-                      sx={textFieldSx}
-                      value={patientEmployer}
-                      onChange={(e) => setPatientEmployer(e.target.value)}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-                  </Box>
-
-                  <TextField
-                    label={currentContent.birthDate}
-                    variant="outlined"
-                    fullWidth
-                    type="date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    sx={textFieldSx}
-                    value={patientBirthDate}
-                    onChange={(e) => setPatientBirthDate(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
+                    >
+                      <MenuItem value="patient">{currentContent.patientLeave}</MenuItem>
+                      <MenuItem value="companion">{currentContent.companionLeave}</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Box>
 
-                <Divider
-                  sx={{
-                    my: 4,
-                    backgroundColor: "rgba(211, 47, 47, 0.2)",
-                    height: "2px",
-                  }}
-                />
-
-                {/* بيانات مرافق المريض */}
-                <Box sx={{ mb: 4 }}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 600,
-                      mb: 3,
-                      color: "#d32f2f",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      fontSize: { xs: "1.5rem", md: "1.8rem" },
-                    }}
-                  >
-                    <FaUserFriends style={{ fontSize: "1.2em" }} />
-                    {currentContent.companionData}
-                  </Typography>
-
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                      gap: 3,
-                      mb: 3,
-                    }}
-                  >
-                    <TextField
-                      label={currentContent.name}
-                      variant="outlined"
-                      fullWidth
-                      sx={textFieldSx}
-                      value={companionName}
-                      onChange={(e) => setCompanionName(e.target.value)}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-
-                    <TextField
-                      label={currentContent.id}
-                      variant="outlined"
-                      fullWidth
-                      sx={textFieldSx}
-                      value={companionId}
-                      onChange={(e) => setCompanionId(e.target.value)}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                      gap: 3,
-                      mb: 3,
-                    }}
-                  >
-                    <TextField
-                      label={currentContent.phone}
-                      variant="outlined"
-                      fullWidth
-                      type="tel"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      sx={textFieldSx}
-                      value={companionPhone}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, "");
-                        setCompanionPhone(value);
+                {/* بيانات المريض */}
+                {(leaveType === "patient" || leaveType === "companion") && (
+                  <Box sx={{ mb: 5 }}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 600,
+                        mb: 3,
+                        color: "#d32f2f",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        fontSize: { xs: "1.5rem", md: "1.8rem" },
                       }}
-                      dir={language === "AR" ? "rtl" : "ltr"}
-                    />
+                    >
+                      <FaUserMd style={{ fontSize: "1.2em" }} />
+                      {currentContent.patientData}
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                        gap: 3,
+                        mb: 3,
+                      }}
+                    >
+                      <TextField
+                        label={currentContent.name}
+                        variant="outlined"
+                        fullWidth
+                        sx={textFieldSx}
+                        value={patientName}
+                        onChange={(e) => setPatientName(e.target.value)}
+                        dir={language === "AR" ? "rtl" : "ltr"}
+                      />
+
+                      <TextField
+                        label={currentContent.id}
+                        variant="outlined"
+                        fullWidth
+                        sx={textFieldSx}
+                        value={patientId}
+                        onChange={(e) => setPatientId(e.target.value)}
+                        dir={language === "AR" ? "rtl" : "ltr"}
+                      />
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                        gap: 3,
+                        mb: 3,
+                      }}
+                    >
+                      <TextField
+                        label={currentContent.phone}
+                        variant="outlined"
+                        fullWidth
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        sx={textFieldSx}
+                        value={patientPhone}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setPatientPhone(value);
+                        }}
+                        dir={language === "AR" ? "rtl" : "ltr"}
+                      />
+
+                      <TextField
+                        label={currentContent.employer}
+                        variant="outlined"
+                        fullWidth
+                        sx={textFieldSx}
+                        value={patientEmployer}
+                        onChange={(e) => setPatientEmployer(e.target.value)}
+                        dir={language === "AR" ? "rtl" : "ltr"}
+                      />
+                    </Box>
 
                     <TextField
-                      label={currentContent.employer}
+                      label={currentContent.birthDate}
                       variant="outlined"
                       fullWidth
+                      type="date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                       sx={textFieldSx}
-                      value={companionEmployer}
-                      onChange={(e) => setCompanionEmployer(e.target.value)}
+                      value={patientBirthDate}
+                      onChange={(e) => setPatientBirthDate(e.target.value)}
                       dir={language === "AR" ? "rtl" : "ltr"}
                     />
                   </Box>
+                )}
 
-                  <TextField
-                    label={currentContent.birthDate}
-                    variant="outlined"
+                {/* بيانات مرافق المريض - تظهر فقط عند اختيار "اجازة مرافق مريض" */}
+                {leaveType === "companion" && (
+                  <>
+                    <Divider
+                      sx={{
+                        my: 4,
+                        backgroundColor: "rgba(211, 47, 47, 0.2)",
+                        height: "2px",
+                      }}
+                    />
+
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 600,
+                          mb: 3,
+                          color: "#d32f2f",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 2,
+                          fontSize: { xs: "1.5rem", md: "1.8rem" },
+                        }}
+                      >
+                        <FaUserFriends style={{ fontSize: "1.2em" }} />
+                        {currentContent.companionData}
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                          gap: 3,
+                          mb: 3,
+                        }}
+                      >
+                        <TextField
+                          label={currentContent.name}
+                          variant="outlined"
+                          fullWidth
+                          sx={textFieldSx}
+                          value={companionName}
+                          onChange={(e) => setCompanionName(e.target.value)}
+                          dir={language === "AR" ? "rtl" : "ltr"}
+                        />
+
+                        <TextField
+                          label={currentContent.id}
+                          variant="outlined"
+                          fullWidth
+                          sx={textFieldSx}
+                          value={companionId}
+                          onChange={(e) => setCompanionId(e.target.value)}
+                          dir={language === "AR" ? "rtl" : "ltr"}
+                        />
+                      </Box>
+
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                          gap: 3,
+                          mb: 3,
+                        }}
+                      >
+                        <TextField
+                          label={currentContent.phone}
+                          variant="outlined"
+                          fullWidth
+                          type="tel"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          sx={textFieldSx}
+                          value={companionPhone}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            setCompanionPhone(value);
+                          }}
+                          dir={language === "AR" ? "rtl" : "ltr"}
+                        />
+
+                        <TextField
+                          label={currentContent.employer}
+                          variant="outlined"
+                          fullWidth
+                          sx={textFieldSx}
+                          value={companionEmployer}
+                          onChange={(e) => setCompanionEmployer(e.target.value)}
+                          dir={language === "AR" ? "rtl" : "ltr"}
+                        />
+                      </Box>
+
+                      <TextField
+                        label={currentContent.birthDate}
+                        variant="outlined"
+                        fullWidth
+                        type="date"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        sx={textFieldSx}
+                        value={companionBirthDate}
+                        onChange={(e) => setCompanionBirthDate(e.target.value)}
+                        dir={language === "AR" ? "rtl" : "ltr"}
+                      />
+                    </Box>
+                  </>
+                )}
+
+                {/* زر الإرسال */}
+                {(leaveType === "patient" || leaveType === "companion") && (
+                  <Button
+                    type="submit"
+                    variant="contained"
                     fullWidth
-                    type="date"
-                    InputLabelProps={{
-                      shrink: true,
+                    sx={{
+                      py: 3,
+                      mt: 4,
+                      borderRadius: "15px",
+                      background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
+                      fontSize: { xs: "1.2rem", md: "1.3rem" },
+                      fontWeight: 700,
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
+                      textTransform: "none",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
+                        background: "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
+                      },
+                      "&:active": {
+                        transform: "translateY(0px)",
+                      },
                     }}
-                    sx={textFieldSx}
-                    value={companionBirthDate}
-                    onChange={(e) => setCompanionBirthDate(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-                </Box>
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    py: 3,
-                    mt: 4,
-                    borderRadius: "15px",
-                    background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
-                    fontSize: { xs: "1.2rem", md: "1.3rem" },
-                    fontWeight: 700,
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 10px 30px rgba(211, 47, 47, 0.4)",
-                    textTransform: "none",
-                    "&:hover": {
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 15px 40px rgba(211, 47, 47, 0.5)",
-                      background: "linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)",
-                    },
-                    "&:active": {
-                      transform: "translateY(0px)",
-                    },
-                  }}
-                >
-                  <FaCalendarAlt
-                    style={{
-                      marginRight: language === "AR" ? "0" : "12px",
-                      marginLeft: language === "AR" ? "12px" : "0",
-                      fontSize: "1.1rem",
-                    }}
-                  />
-                  {currentContent.submit}
-                </Button>
+                  >
+                    <FaCalendarAlt
+                      style={{
+                        marginRight: language === "AR" ? "0" : "12px",
+                        marginLeft: language === "AR" ? "12px" : "0",
+                        fontSize: "1.1rem",
+                      }}
+                    />
+                    {currentContent.submit}
+                  </Button>
+                )}
               </Box>
             </Box>
           )}
