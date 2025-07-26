@@ -9,10 +9,7 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  Divider,
 } from "@mui/material";
 import {
   FaPhoneAlt,
@@ -22,6 +19,8 @@ import {
   FaCalendarAlt,
   FaIdCard,
   FaBriefcase,
+  FaUser,
+  FaUserFriends,
 } from "react-icons/fa";
 import axios from "axios";
 import image4 from "../assets/image4.jpg";
@@ -29,12 +28,21 @@ import image4 from "../assets/image4.jpg";
 function BookingPage({ language }) {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [name, setName] = useState("");
-  const [id, setId] = useState("");
-  const [phone, setPhone] = useState("");
-  const [employer, setEmployer] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [leaveType, setLeaveType] = useState("");
+  
+  // بيانات المريض
+  const [patientName, setPatientName] = useState("");
+  const [patientId, setPatientId] = useState("");
+  const [patientPhone, setPatientPhone] = useState("");
+  const [patientEmployer, setPatientEmployer] = useState("");
+  const [patientBirthDate, setPatientBirthDate] = useState("");
+  
+  // بيانات مرافق المريض
+  const [companionName, setCompanionName] = useState("");
+  const [companionId, setCompanionId] = useState("");
+  const [companionPhone, setCompanionPhone] = useState("");
+  const [companionEmployer, setCompanionEmployer] = useState("");
+  const [companionBirthDate, setCompanionBirthDate] = useState("");
+  
   const [openAlert, setOpenAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccess, setAlertSuccess] = useState(true);
@@ -43,17 +51,16 @@ function BookingPage({ language }) {
 
   const content = {
     AR: {
-      title: "نموذج طلب إجازة",
+      title: "نموذج طلب إجازة مرافق مريض",
       subtitle: "نقدم خدمات طبية متخصصة بأحدث التقنيات العالمية",
       password: "كلمة المرور",
+      patientData: "بيانات المريض",
+      companionData: "بيانات مرافق المريض",
       name: "الاسم الكامل",
       id: "رقم الهوية",
       phone: "رقم الجوال",
       employer: "جهة العمل",
       birthDate: "تاريخ الميلاد",
-      leaveType: "نوع الإجازة",
-      sickLeave: "إجازة مريض",
-      companionLeave: "إجازة مرافق مريض",
       submit: "إرسال",
       enterPassword: "إدخال",
       invalidPassword: "كلمة المرور غير صحيحة",
@@ -62,17 +69,16 @@ function BookingPage({ language }) {
       fillAllFields: "يرجى إدخال جميع البيانات",
     },
     EN: {
-      title: "Leave Request Form",
+      title: "Patient Companion Leave Request Form",
       subtitle: "We offer specialized medical services with the latest global technologies",
       password: "Password",
+      patientData: "Patient Information",
+      companionData: "Patient Companion Information",
       name: "Full Name",
       id: "ID Number",
       phone: "Phone Number",
       employer: "Employer",
       birthDate: "Birth Date",
-      leaveType: "Leave Type",
-      sickLeave: "Sick Leave",
-      companionLeave: "Patient Companion Leave",
       submit: "Send",
       enterPassword: "Enter",
       invalidPassword: "Invalid password",
@@ -101,16 +107,23 @@ function BookingPage({ language }) {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    if (name && id && phone && employer && birthDate && leaveType) {
+    if (
+      patientName && patientId && patientPhone && patientEmployer && patientBirthDate &&
+      companionName && companionId && companionPhone && companionEmployer && companionBirthDate
+    ) {
       try {
         const data = {
           data: [{
-            الأسم: name,
-            رقم_الهوية: id,
-            رقم_الجوال: phone,
-            جهة_العمل: employer,
-            تاريخ_الميلاد: birthDate,
-            نوع_الإجازة: leaveType,
+            اسم_المريض: patientName,
+            رقم_هوية_المريض: patientId,
+            رقم_الجوال_المريض: patientPhone,
+            جهة_العمل_المريض: patientEmployer,
+            تاريخ_الميلاد_المريض: patientBirthDate,
+            اسم_مرافق_المريض: companionName,
+            رقم_هوية_مرافق_المريض: companionId,
+            رقم_الجوال_مرافق_المريض: companionPhone,
+            جهة_العمل_مرافق_المريض: companionEmployer,
+            تاريخ_الميلاد_مرافق_المريض: companionBirthDate,
             وقت_ادخال_البيانات: new Date().toLocaleString("en-US"),
           }],
         };
@@ -127,12 +140,17 @@ function BookingPage({ language }) {
         setAlertMessage(currentContent.successMessage);
         setOpenAlert(true);
 
-        setName("");
-        setId("");
-        setPhone("");
-        setEmployer("");
-        setBirthDate("");
-        setLeaveType("");
+        // إعادة تعيين جميع الحقول
+        setPatientName("");
+        setPatientId("");
+        setPatientPhone("");
+        setPatientEmployer("");
+        setPatientBirthDate("");
+        setCompanionName("");
+        setCompanionId("");
+        setCompanionPhone("");
+        setCompanionEmployer("");
+        setCompanionBirthDate("");
       } catch (error) {
         console.error("Full error object:", error);
         console.error("Error response:", error.response?.data);
@@ -169,30 +187,6 @@ function BookingPage({ language }) {
         color: "#d32f2f",
         opacity: 0.7,
       },
-    },
-    "& .MuiInputLabel-root": {
-      color: "#d32f2f",
-      fontWeight: 500,
-      "&.Mui-focused": {
-        color: "#d32f2f",
-      },
-    },
-  };
-
-  const selectSx = {
-    color: "#333333",
-    backgroundColor: "#ffffff",
-    borderRadius: "12px",
-    "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(211, 47, 47, 0.3)",
-      borderWidth: "2px",
-    },
-    "&:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(211, 47, 47, 0.6)",
-    },
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#d32f2f",
-      borderWidth: "2px",
     },
     "& .MuiInputLabel-root": {
       color: "#d32f2f",
@@ -356,7 +350,7 @@ function BookingPage({ language }) {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "900px",
+                maxWidth: "1000px",
                 p: { xs: 3, sm: 4, md: 5 },
                 borderRadius: "20px",
                 boxShadow: "0 25px 50px rgba(0,0,0,0.15)",
@@ -410,78 +404,88 @@ function BookingPage({ language }) {
               </Typography>
 
               <Box component="form" onSubmit={handleFormSubmit}>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    gap: 4,
-                    mb: 4,
-                  }}
-                >
-                  <TextField
-                    label={currentContent.name}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-
-                  <TextField
-                    label={currentContent.id}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={id}
-                    onChange={(e) => setId(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    gap: 4,
-                    mb: 4,
-                  }}
-                >
-                  <TextField
-                    label={currentContent.phone}
-                    variant="outlined"
-                    fullWidth
-                    type="tel"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    sx={textFieldSx}
-                    value={phone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, "");
-                      setPhone(value);
+                {/* بيانات المريض */}
+                <Box sx={{ mb: 5 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 600,
+                      mb: 3,
+                      color: "#d32f2f",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      fontSize: { xs: "1.5rem", md: "1.8rem" },
                     }}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
+                  >
+                    <FaUserMd style={{ fontSize: "1.2em" }} />
+                    {currentContent.patientData}
+                  </Typography>
 
-                  <TextField
-                    label={currentContent.employer}
-                    variant="outlined"
-                    fullWidth
-                    sx={textFieldSx}
-                    value={employer}
-                    onChange={(e) => setEmployer(e.target.value)}
-                    dir={language === "AR" ? "rtl" : "ltr"}
-                  />
-                </Box>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                      gap: 3,
+                      mb: 3,
+                    }}
+                  >
+                    <TextField
+                      label={currentContent.name}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
 
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    gap: 4,
-                    mb: 4,
-                  }}
-                >
+                    <TextField
+                      label={currentContent.id}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={patientId}
+                      onChange={(e) => setPatientId(e.target.value)}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                      gap: 3,
+                      mb: 3,
+                    }}
+                  >
+                    <TextField
+                      label={currentContent.phone}
+                      variant="outlined"
+                      fullWidth
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      sx={textFieldSx}
+                      value={patientPhone}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, "");
+                        setPatientPhone(value);
+                      }}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+
+                    <TextField
+                      label={currentContent.employer}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={patientEmployer}
+                      onChange={(e) => setPatientEmployer(e.target.value)}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+                  </Box>
+
                   <TextField
                     label={currentContent.birthDate}
                     variant="outlined"
@@ -491,27 +495,115 @@ function BookingPage({ language }) {
                       shrink: true,
                     }}
                     sx={textFieldSx}
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                    value={patientBirthDate}
+                    onChange={(e) => setPatientBirthDate(e.target.value)}
                     dir={language === "AR" ? "rtl" : "ltr"}
                   />
+                </Box>
 
-                  <FormControl fullWidth sx={selectSx}>
-                    <InputLabel>{currentContent.leaveType}</InputLabel>
-                    <Select
-                      value={leaveType}
-                      onChange={(e) => setLeaveType(e.target.value)}
-                      label={currentContent.leaveType}
+                <Divider
+                  sx={{
+                    my: 4,
+                    backgroundColor: "rgba(211, 47, 47, 0.2)",
+                    height: "2px",
+                  }}
+                />
+
+                {/* بيانات مرافق المريض */}
+                <Box sx={{ mb: 4 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 600,
+                      mb: 3,
+                      color: "#d32f2f",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      fontSize: { xs: "1.5rem", md: "1.8rem" },
+                    }}
+                  >
+                    <FaUserFriends style={{ fontSize: "1.2em" }} />
+                    {currentContent.companionData}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                      gap: 3,
+                      mb: 3,
+                    }}
+                  >
+                    <TextField
+                      label={currentContent.name}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={companionName}
+                      onChange={(e) => setCompanionName(e.target.value)}
                       dir={language === "AR" ? "rtl" : "ltr"}
-                    >
-                      <MenuItem value={currentContent.sickLeave}>
-                        {currentContent.sickLeave}
-                      </MenuItem>
-                      <MenuItem value={currentContent.companionLeave}>
-                        {currentContent.companionLeave}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                    />
+
+                    <TextField
+                      label={currentContent.id}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={companionId}
+                      onChange={(e) => setCompanionId(e.target.value)}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                      gap: 3,
+                      mb: 3,
+                    }}
+                  >
+                    <TextField
+                      label={currentContent.phone}
+                      variant="outlined"
+                      fullWidth
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      sx={textFieldSx}
+                      value={companionPhone}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, "");
+                        setCompanionPhone(value);
+                      }}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+
+                    <TextField
+                      label={currentContent.employer}
+                      variant="outlined"
+                      fullWidth
+                      sx={textFieldSx}
+                      value={companionEmployer}
+                      onChange={(e) => setCompanionEmployer(e.target.value)}
+                      dir={language === "AR" ? "rtl" : "ltr"}
+                    />
+                  </Box>
+
+                  <TextField
+                    label={currentContent.birthDate}
+                    variant="outlined"
+                    fullWidth
+                    type="date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    sx={textFieldSx}
+                    value={companionBirthDate}
+                    onChange={(e) => setCompanionBirthDate(e.target.value)}
+                    dir={language === "AR" ? "rtl" : "ltr"}
+                  />
                 </Box>
 
                 <Button
@@ -520,6 +612,7 @@ function BookingPage({ language }) {
                   fullWidth
                   sx={{
                     py: 3,
+                    mt: 4,
                     borderRadius: "15px",
                     background: "linear-gradient(45deg, #d32f2f 30%, #f44336 90%)",
                     fontSize: { xs: "1.2rem", md: "1.3rem" },
